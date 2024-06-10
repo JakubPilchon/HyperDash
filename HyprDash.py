@@ -5,6 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import time
 
 class Dashboard(GridSearchCV):
 
@@ -47,8 +48,12 @@ class Dashboard(GridSearchCV):
         
         self.is_fitted = True
         
-        # do Gridsearch
+        # do Gridsearch, also measure time elapsed during searching
+        start = time.time()
         super().fit(x,y)
+        end = time.time()
+
+        self.time = end - start
         
         print("Training ended succesfully.")
         # self.DATA_FILE_NAME -> file name of main data file
@@ -142,6 +147,36 @@ class Dashboard(GridSearchCV):
                     text-align: center;
                     border-style:none;
                 }
+                                div.info {
+                    padding-top: 5px;
+                    padding-bottom: 5px;
+                    margin-left: auto;
+                    margin-right: auto;
+                    margin-top: 10px;
+                    margin-bottom: 10px;
+                    width: 1000px;
+                    background-color: rgb(43,46,51);
+                    border: 3px solid rgb(56, 60, 67);
+                    border-radius: 5px;
+                    gap: 10px;
+                    display: flex;
+                }
+                div.separator {
+                    width: 50%;
+                    font-size: large;
+                    padding-left: 10px;
+                }
+                #overview {
+                    border: 3px solid rgb(66, 70, 77);
+                    border-radius: 5px;
+                    background: #AB81CD;
+                    padding: 5px;
+                    margin-left: 0px;
+                    max-width: 50%;
+                    border-radius: 10px;
+                    margin-top: 10px;
+                    font-size: larger;
+                }
                 th {
                     background-color:rgb(101,69,151);
                     padding: 5px;
@@ -168,11 +203,24 @@ class Dashboard(GridSearchCV):
         </div>
         
         <div class="table">
+            [info]
         <br>
             [table]
         </div></body></html>'''
 
-        # get insert table with gridsearch results into layout
+        # overview table, to be pasted in [info]
+        overview = """
+                <div class = "info"><div class="separator">
+                    <div id="overview"><b>Overview</b></div><br> Number of iterations: {} <br><br> Best model score: {} <br> Mean  model score: {} <br> Model score standard deviation: {}
+                </div>
+                <div class="separator">
+                        <br><br><br>Tuning time: {}s <br> <br> Best time: {}s <br> Mean model time: {}s <br> Model time standard deviation: {}s </div></div>"""
+        
+        overview = overview.format(len(self.data), str(self.best_score_), self.data["mean_test_score"].mean(), self.data["mean_test_score"].std(),
+                                    self.time, self.data["mean_fit_time"].min(), self.data["mean_fit_time"].mean(), self.data["mean_fit_time"].std())
+
+        html_text = html_text.replace("[info]", overview)
+        # insert table with gridsearch results into layout
         html_text = html_text.replace("[table]", self.data.sort_values("rank_test_score").reset_index().to_html(columns=['mean_fit_time', 'split0_test_score', 'split1_test_score',
        'split2_test_score', 'split3_test_score', 'split4_test_score', 'mean_test_score', 'std_test_score', 'rank_test_score'] + self.PARAMS_KEY, border=0))
         
