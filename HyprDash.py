@@ -160,12 +160,13 @@ class Dashboard(GridSearchCV):
 
         <body>
         <div class="header">
-        <h1>HyprDash</h1>
-        <ul>
-            <li><a href="#home">Results</a></li>
-            <li><a href="#news">Hyperparameter Analytics</a></li>
+            <h1>HyprDash</h1>
+            <ul>
+                <li><a href="index.html">Results</a></li>
+                <li><a href="viz_site.html">Hyperparameter Analytics</a></li>
             </ul>
         </div>
+        
         <div class="table">
         <br>
             [table]
@@ -274,8 +275,8 @@ class Dashboard(GridSearchCV):
         <div class="header">
         <h1>HyprDash</h1>
         <ul>
-            <li><a href="#home">Results</a></li>
-            <li><a href="#news">Hyperparameter Analytics</a></li>
+            <li><a href="index.html">Results</a></li>
+            <li><a href="viz_site.html">Hyperparameter Analytics</a></li>
             </ul>
         </div>
         <div class="main_container">
@@ -323,6 +324,5 @@ if __name__ == "__main__":
     #clf = GridSearchCV(DecisionTreeClassifier(), params)
     iris = load_iris()
     clf = Dashboard(DecisionTreeClassifier(), params, "lollllol")
-
 
     clf.fit_and_viz(iris.data, iris.target)
