@@ -284,12 +284,15 @@ class Dashboard(GridSearchCV):
                     padding-bottom: 5px;
                     margin-left: auto;
                     margin-right: auto;
-                    width: 1000px;
+                    min-width: 1100px;
                     background-color: rgb(43,46,51);
                     border: 3px solid rgb(56, 60, 67);
                     border-radius: 5px;
 
                     gap: 10px;
+                }
+                table.dataframe {
+                    margin: 10px;
                 }
                 #title_and_viz {
                     min-width: 680px;
@@ -297,7 +300,7 @@ class Dashboard(GridSearchCV):
                 }
                 #stats {
                     float: right;
-                    width: 320px;
+                    min-width: 420px;
                 }
                 #title {
                     border: 3px solid rgb(66, 70, 77);
@@ -308,14 +311,27 @@ class Dashboard(GridSearchCV):
                     height: 10%;
                     border-radius: 10px;
                     margin: 10px;
-
                 }
+
                 img {
                     display: block;
                     text-align: center;
                     margin-left: 1%;
                     margin-right: auto;
                 }
+                th {
+                    background-color:rgb(101,69,151);
+                    padding: 5px;
+                }
+                tr:nth-child(even) {
+                background-color: rgb(43,46,51);
+                }
+                tr:nth-child(odd) {
+                background-color: rgb(56, 60, 67);
+                }
+                tr:hover {
+                    background-color: rgb(33,36,41);
+                }       
             </style>
         </head>
 
@@ -343,8 +359,7 @@ class Dashboard(GridSearchCV):
             </div>
 
             <div id="stats" class = "separator"> 
-                <h3>Score std: {}</h3>
-                <h3>time std: {}</h3><br></div></div>'''
+                {}</div></div>'''
 
         table = ''
         #iterate over hyperparameters
@@ -353,13 +368,12 @@ class Dashboard(GridSearchCV):
             title = param[6:]
             # add path to plots
             source = os.path.join("viz", param+'_plot.png')
-            # add standard deviation of mean model scores by hyperparameter
-            score_std = str(self.data.groupby([param])['mean_test_score'].mean().std())[:7]
-            # add standard deviation of mean model training time by hyperparameter
-            time_std = str(self.data.groupby([param])['mean_fit_time'].mean().std())[:7]
+
+            # generate score performance table using pandas
+            scores_table = self.data[["mean_test_score", param]].groupby(param).mean().reset_index().to_html(border=0)
 
             # add feature container html code into main threshold
-            table += container.format(title, source, score_std, time_std)
+            table += container.format(title, source, scores_table)
         # add feature containers to main sites
         vis_site = vis_site.replace('[features]', table)
 
