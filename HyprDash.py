@@ -370,7 +370,7 @@ class Dashboard(GridSearchCV):
             source = os.path.join("viz", param+'_plot.png')
 
             # generate score performance table using pandas
-            scores_table = self.data[["mean_test_score", param]].groupby(param).mean().reset_index().to_html(border=0)
+            scores_table = self.data[["mean_test_score", param]].groupby(param).mean().reset_index().rename(columns={'mean_test_score': 'Mean test score', param: param[6:].capitalize().replace("_", " ")}).to_html(border=0)
 
             # add feature container html code into main threshold
             table += container.format(title, source, scores_table)
