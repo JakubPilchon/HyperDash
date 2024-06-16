@@ -44,7 +44,7 @@ class Dashboard(GridSearchCV):
         
 
 
-    def fit_and_viz(self, x,y, data_file_name:str = "data") -> None:
+    def fit_and_viz(self, x,y, data_file_name:str = "data", test_iter:int = 2000, test_alpha:float = 5.) -> None:
         
         self.is_fitted = True
         
@@ -84,20 +84,22 @@ class Dashboard(GridSearchCV):
             fig.set_facecolor("#2B2E33")
 
             fig.savefig(os.path.join(self.path, self.dirname, "viz", param +"_plot.png"))
-
-            #with plt.style.context('dark_background'):
-                #plt.bar(self.data.groupby([param])[score].mean(), title=title, rot=360, edgecolor = "white", color=['#AB81CD'])
-                #self.data.groupby([param])[score].mean()
-                #.plot(kind="bar", title=title, rot=360, edgecolor = "white", color=['#AB81CD']).figure.savefig(os.path.join(self.path, self.dirname, "viz", param +"_plot.png"))
+                        
             #figures  path: "self.path + '/' + self.dirname + '/' + "viz" + '/' + param +"_plot.png"
 
+        # Conduct permutaton tests
+        p_values = self.permutation_tests(test_iter)
         #create websites
-        self.create_mainwebsite()
-        self.create_viz_website()
+        self.__create_mainwebsite()
+        self.__create_viz_website(p_values, test_alpha)
 
-    def permutation_tests(self, N=2000) -> dict:
+    def permutation_tests(self, N:int) -> dict:
         if not self.is_fitted:
             raise Exception("You need to call self.fit_and_viz beforehand")
+        
+        # Permutation Test
+        # h_0 -> The observed standard deviation in grouped hyperparameter mean scores is due to random chance and NOT due to diffrences in given hyperparameter
+        # h_n -> The observed standard deviation in grouped hyperparameter mean scores is due to diffrences in given hyperparameter and not random chance
 
         #real_data - a hashmap consisting of pairs {parameter_name: standard deviation of mean scores by hyperparameter}
         real_data = {param:self.data[["mean_test_score", param]].groupby(param).mean().std().values[0] for param in self.PARAMS_KEY}
@@ -114,6 +116,7 @@ class Dashboard(GridSearchCV):
             #rearange mock_data without replacement 
             mock_data = np.random.permutation(mock_data)
 
+            # iterate over every hyperparameter tested
             for param in self.PARAMS_KEY:
                 # variations - number of possibilities in hyperparameter
                 variations = len(self.params[param[6:]])
@@ -266,7 +269,7 @@ class Dashboard(GridSearchCV):
         with open(os.path.join(self.path, self.dirname, file_name), "w") as f:
             f.write(html_text)
 
-    def __create_viz_website(self):
+    def __create_viz_website(self, p_values:dict, alpha:float) -> None:
 
         if not self.is_fitted:
             raise Exception("You need to call self.fit_and_viz beforehand")
@@ -395,9 +398,10 @@ class Dashboard(GridSearchCV):
             </div>
 
             <div id="stats" class = "separator"> 
-                {}</div></div>'''
+                {} <br> {} <br> P value: {}</div></div>'''
 
         table = ''
+
         #iterate over hyperparameters
         for param in self.PARAMS_KEY:
             # add title
@@ -408,8 +412,16 @@ class Dashboard(GridSearchCV):
             # generate score performance table using pandas
             scores_table = self.data[["mean_test_score", param]].groupby(param).mean().reset_index().rename(columns={'mean_test_score': 'Mean test score', param: param[6:].capitalize().replace("_", " ")}).to_html(border=0)
 
+            # test if p value is bigger or equal to alpha
+            if p_values[param] >= alpha:
+                # if p value is bigger than alpha value, then we suppose that alternative hypothesis is true
+                true_h = "The observed standard deviation in grouped hyperparameter mean scores is due to random chance and NOT due to diffrences in given hyperparameter"
+            else:
+                # otherwise it is safe to assume that alternative hypothesis is true
+                true_h = "The observed standard deviation in grouped hyperparameter mean scores is due to diffrences in given hyperparameter and not random chance"
+
             # add feature container html code into main threshold
-            table += container.format(title, source, scores_table)
+            table += container.format(title, source, scores_table, true_h ,p_values[param])
         # add feature containers to main sites
         vis_site = vis_site.replace('[features]', table)
 
