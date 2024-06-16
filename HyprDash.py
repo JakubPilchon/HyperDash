@@ -131,7 +131,7 @@ class Dashboard(GridSearchCV):
 
 
 
-    def create_mainwebsite(self) -> None:
+    def __create_mainwebsite(self) -> None:
         if not self.is_fitted:
             raise Exception("You need to call self.fit_and_viz beforehand")
 
@@ -266,7 +266,7 @@ class Dashboard(GridSearchCV):
         with open(os.path.join(self.path, self.dirname, file_name), "w") as f:
             f.write(html_text)
 
-    def create_viz_website(self):
+    def __create_viz_website(self):
 
         if not self.is_fitted:
             raise Exception("You need to call self.fit_and_viz beforehand")
