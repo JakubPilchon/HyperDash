@@ -1,8 +1,8 @@
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import os
 import time
@@ -95,7 +95,43 @@ class Dashboard(GridSearchCV):
         self.create_mainwebsite()
         self.create_viz_website()
 
-    def create_mainwebsite(self):
+    def permutation_tests(self, N=2000) -> dict:
+        if not self.is_fitted:
+            raise Exception("You need to call self.fit_and_viz beforehand")
+
+        #real_data - a hashmap consisting of pairs {parameter_name: standard deviation of mean scores by hyperparameter}
+        real_data = {param:clf.data[["mean_test_score", param]].groupby(param).mean().std().values[0] for param in self.PARAMS_KEY}
+
+        # mock_data is numpy array for efficency reasons 
+        mock_data = np.array(clf.data["mean_test_score"])
+
+        # dictionary consisting of pairs: {parameter_name: 0}
+        # It will be used to store p_values
+        p_values = {param:0 for param in clf.PARAMS_KEY}
+
+        # N - number of iterations
+        for _ in range(N):
+            #rearange mock_data without replacement 
+            mock_data = np.random.permutation(mock_data)
+
+            for param in clf.PARAMS_KEY:
+                # variations - number of possibilities in hyperparameter
+                variations = len(clf.params[param[6:]])
+                # reshape dataset in order to mimick grouping by hyperparameter
+                np_data = mock_data.reshape((variations, int(len(mock_data)/variations)))   
+                
+                # if simulated outcome is bigger or equal to the observed in real dataset, then add 1 to p_values dict
+                if real_data[param] <= np.std(np.mean(np_data, axis=-1)):
+                    p_values[param] += 1
+
+        # write p_values into percentiles
+        p_values = {param:p_values[param]/N * 100 for param in p_values}
+
+        return p_values
+
+
+
+    def create_mainwebsite(self) -> None:
         if not self.is_fitted:
             raise Exception("You need to call self.fit_and_viz beforehand")
 
