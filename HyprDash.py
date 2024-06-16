@@ -100,23 +100,23 @@ class Dashboard(GridSearchCV):
             raise Exception("You need to call self.fit_and_viz beforehand")
 
         #real_data - a hashmap consisting of pairs {parameter_name: standard deviation of mean scores by hyperparameter}
-        real_data = {param:clf.data[["mean_test_score", param]].groupby(param).mean().std().values[0] for param in self.PARAMS_KEY}
+        real_data = {param:self.data[["mean_test_score", param]].groupby(param).mean().std().values[0] for param in self.PARAMS_KEY}
 
         # mock_data is numpy array for efficency reasons 
-        mock_data = np.array(clf.data["mean_test_score"])
+        mock_data = np.array(self.data["mean_test_score"])
 
         # dictionary consisting of pairs: {parameter_name: 0}
         # It will be used to store p_values
-        p_values = {param:0 for param in clf.PARAMS_KEY}
+        p_values = {param:0 for param in self.PARAMS_KEY}
 
         # N - number of iterations
         for _ in range(N):
             #rearange mock_data without replacement 
             mock_data = np.random.permutation(mock_data)
 
-            for param in clf.PARAMS_KEY:
+            for param in self.PARAMS_KEY:
                 # variations - number of possibilities in hyperparameter
-                variations = len(clf.params[param[6:]])
+                variations = len(self.params[param[6:]])
                 # reshape dataset in order to mimick grouping by hyperparameter
                 np_data = mock_data.reshape((variations, int(len(mock_data)/variations)))   
                 
