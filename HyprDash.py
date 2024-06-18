@@ -355,7 +355,7 @@ class Dashboard(GridSearchCV):
                     margin: 10px;
                 }
                 #pvalue {
-                  max-width: 200px;
+                  max-width: 350px;
                   border-radius: 5px;
                   border: 3px solid rgb(56, 60, 67);
                   margin: 5px;
