@@ -354,7 +354,14 @@ class Dashboard(GridSearchCV):
                     border-radius: 10px;
                     margin: 10px;
                 }
-
+                #pvalue {
+                  max-width: 200px;
+                  border-radius: 5px;
+                  border: 3px solid rgb(56, 60, 67);
+                  margin: 5px;
+                  overflow: auto;
+                  padding: 5px;
+                }
                 img {
                     display: block;
                     text-align: center;
@@ -401,7 +408,7 @@ class Dashboard(GridSearchCV):
             </div>
 
             <div id="stats" class = "separator"> 
-                {} <br> {} <br> P value: {}</div></div>'''
+                {} <br> <div id="pvalue"> {} <br> P value: {}</div></div></div>'''
 
         table = ''
 
