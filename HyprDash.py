@@ -44,7 +44,10 @@ class Dashboard(GridSearchCV):
         
 
 
-    def fit_and_viz(self, x,y, data_file_name:str = "data", test_iter:int = 2000, test_alpha:float = 5.) -> None:
+    def fit_and_viz(self, x,y, data_file_name:str = "data", test_iter:int = 2000, test_alpha:float = .05) -> None:
+
+        if not (test_alpha > 0 and test_alpha < 1):
+            raise ValueError("test_alpha value must be between 0 and 1. ")
         
         self.is_fitted = True
         
@@ -413,7 +416,7 @@ class Dashboard(GridSearchCV):
             scores_table = self.data[["mean_test_score", param]].groupby(param).mean().reset_index().rename(columns={'mean_test_score': 'Mean test score', param: param[6:].capitalize().replace("_", " ")}).to_html(border=0)
 
             # test if p value is bigger or equal to alpha
-            if p_values[param] >= alpha:
+            if p_values[param] >= alpha * 100:
                 # if p value is bigger than alpha value, then we suppose that alternative hypothesis is true
                 true_h = "The observed standard deviation in grouped hyperparameter mean scores is due to random chance and NOT due to diffrences in given hyperparameter"
             else:
