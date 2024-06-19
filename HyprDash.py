@@ -74,15 +74,12 @@ class Dashboard(GridSearchCV):
 
         # Generate bar plots of mean score by parameters
         for param in self.PARAMS_KEY:
-            score = 'mean_test_score'
-            # title: mean test score by param
-            title= score.replace("_", " ") +" by "+  param[6:].replace("_", " ")
-            # rotating xticks for 360 degrees because it rotates xticks by 90 degrees, god knows why
+            title= "Scores distribution by "+  param[6:].replace("_", " ")
 
             with plt.style.context('dark_background'):
                 fig, ax = plt.subplots()
-                self.data.groupby([param])['mean_test_score'].mean().plot(kind= 'bar', ax=ax,
-                                                                         edgecolor="w",rot=360,title=title, color=['#AB81CD'])
+                #self.data.groupby([param])['mean_test_score'].mean().plot(kind= 'bar', ax=ax,edgecolor="w",rot=360,title=title, color=['#AB81CD'])
+                self.data[[param, "mean_test_score"]].groupby(param)["mean_test_score"].plot(kind="kde", ax=ax, legend=True, title=title, xlabel="Score")
             ax.set_facecolor("#383C43")
             fig.set_facecolor("#2B2E33")
 
