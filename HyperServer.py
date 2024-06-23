@@ -3,6 +3,19 @@ import os
 from functools import partial
 
 class HyperDashServer(HTTPServer):
+    """
+        Implementation of server for HyperDash.
+        This class inherits from `http.server.HTTPServer`.
+
+        Parameters:
+            directory : str
+                 directory where Dashboard sites are located.
+            host : str, optional
+                 server address. Default is "localhost"
+            port : int
+                 port on which server is run. Default is `8050`
+    """
+    
     def __init__(self, directory:str, host:str ="localhost", port:int = 8050, **kwargs) -> None:
         #check for missing files
         missed = []
@@ -22,6 +35,13 @@ class HyperDashServer(HTTPServer):
         super().__init__((self.host, self.port), handler , **kwargs)
 
     def serve_forever(self, poll_interval: float = 0.5) -> None:
+        """
+            Parent method override, that adds information and  manages server shutdown.
+
+            Parameters:
+                poll_interval : float
+                     Default is `0.5`
+        """
         print("Server online at http://{}:{}/ \n Ctrl+C to end".format(self.host, self.port))
         try:
             return super().serve_forever(poll_interval)

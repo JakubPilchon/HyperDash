@@ -8,6 +8,51 @@ import os
 import time
 
 class Dashboard(GridSearchCV):
+    """
+    Class creating Hyperdash directory containing HTML files and plots. 
+
+    This class inherits form `sklearn.model_selection_GridSearchCV`.
+
+    Parameters:
+        model : 
+             the scikit-learn estimator interface. The machine learning model on which we conduct hyperparameter search
+        params : dict
+             dictionary consisting of hyperparameters we do gridsearch on, looks like: {"hyperparameter" : [1,2,3]}
+        dirname : str
+             directory name of main wrapper directory
+        path : str, optional
+             path where we want to hyperdash directory to appear, if not provided path is assumed to be current working directory
+
+    Attributes:
+        PARAMS_KEY : list of strings
+             list of hyperparameters, with 'param_' added on the beggining. Adresses of hyperparameters serieses in data DataFrame.
+        is_fitted : Bool = False
+             stores information whether `fit()` mehod was previously called.
+                    
+    Atributes after calling fit() method:
+        data : pandas.DataFrame
+             Dataframe containing gridsearch results
+        time : float
+             Time duration of gridsearch
+        DATA_FILE_NAME : str
+             file name on which are stored gridsearhc results
+
+    Public Methods:
+        fit() :
+             Conducts hyperparametes Gridsearch. Saves its results into `data` and "data.csv".
+             Generates and save visualizations plots into '\viz' directory. Creates HTML dasboards.
+        permutation_tests() :
+             Conducts permutation tests over ALL of hyperparameters.
+
+    Private Methods:
+        __create_mainwebsite():
+             Creates main HTML dashboard. Saves it as "index.html".
+             Site consists of basic information panel, and table displaying Gridsearch results.
+        __create_viz();
+             Creates main HTML dashboard. Saves it as "viz_site.html".
+             Site consists of panels containing plots and other informations.
+        """
+  
 
     def __init__(self, model, params, dirname: str, path: str = os.getcwd()) -> None:
         self.is_fitted = False
@@ -15,43 +60,53 @@ class Dashboard(GridSearchCV):
         # initialize the parent class GridSearchCVS
         super().__init__(model, params)
 
-        # self.dirname -> directory name of main wrapper directory
         self.dirname = dirname
 
-        # self.model -> machine learning model on which we do hyperparameter analysis
         self.model = model
 
-        # self.params -> dictionary consisting of hyperparameters we do gridsearch on, looks like: {"hyperparameter" : [1,2,3]}
         self.params = params
 
-        # self.path -> path to main project directory excluding the directory at the end
         self.path = path
 
-        # self.PARAMS_KEY -> adresses of hyperparameters serieses in data dataframe
         self.PARAMS_KEY = ["param_" + n for n in params]
 
-        #creating project directory if the directory does not exist already, else returning and error
+        #creating project directory if the directory does not exist already, else returning an error
         if  self.dirname  not in os.listdir(self.path):
             print("Creating project directory at: " + self.path + "/" + self.dirname)
             # main project directory
             os.makedirs(os.path.join(self.path, self.dirname))
-            #os.makedirs(self.path + "/" + self.dirname)
             # main figures and plots directory
             os.makedirs(os.path.join(self.path, self.dirname, "viz"))
-            #os.makedirs(self.path + "/" + self.dirname + '/' + "viz")
         else:
             raise FileExistsError(f"directory named {self.dirname} already exists in {self.path}")
         
 
 
-    def fit_and_viz(self, x,y, data_file_name:str = "data", test_iter:int = 2000, test_alpha:float = .05) -> None:
+    def fit(self, x,y, data_file_name:str = "data", test_iter:int = 2000, test_alpha:float = .05) -> None:
+        r"""
+            Conducts hyperparametes Gridsearch. Saves its results into `data` and "data.csv".
+            Generates and save visualizations plots into '\viz' directory. Creates HTML dasboards.
 
-        if not (test_alpha > 0 and test_alpha < 1):
+            Parameters:
+                x : array-like
+                     data on which model is tested.
+                y : array-like
+                     data target on which model perforamnce is evaluated.
+                data_file_name : str, optional
+                     file name on which gridsearch results are stored. Default is "data".
+                test_iter : int, optional
+                     iterations of permutation tests. Default is `2000`.
+                test_alpha : floay, optional
+                     threshold for statistical significance. Default is `0.05`. Needs to be a value between `0.` and `1.0`.
+                     If p value is smaller than `test_alpha` then it is safe to assume that alternative hypothesis is true.
+        """
+
+        if not (test_alpha > 0. and test_alpha < 1.):
             raise ValueError("test_alpha value must be between 0 and 1. ")
         
         self.is_fitted = True
         
-        # do Gridsearch, also measure time elapsed during searching
+        # conduct Gridsearch, also measure time elapsed during searching
         start = time.time()
         super().fit(x,y)
         end = time.time()
@@ -78,7 +133,6 @@ class Dashboard(GridSearchCV):
 
             with plt.style.context('dark_background'):
                 fig, ax = plt.subplots()
-                #self.data.groupby([param])['mean_test_score'].mean().plot(kind= 'bar', ax=ax,edgecolor="w",rot=360,title=title, color=['#AB81CD'])
                 self.data[[param, "mean_test_score"]].groupby(param)["mean_test_score"].plot(kind="kde", ax=ax, legend=True, title=title, xlabel="Score")
             ax.set_facecolor("#383C43")
             fig.set_facecolor("#2B2E33")
@@ -94,6 +148,22 @@ class Dashboard(GridSearchCV):
         self.__create_viz_website(p_values, test_alpha)
 
     def permutation_tests(self, N:int) -> dict:
+        """
+            Conducts permutation tests over ALL of hyperparameters.
+            Permutation Test hypothesis:
+                h_0 -> The observed standard deviation in grouped hyperparameter mean scores is due to random chance and NOT due to diffrences in given hyperparameter
+                h_n -> The observed standard deviation in grouped hyperparameter mean scores is due to diffrences in given hyperparameter and not random chance
+
+            Warning: `fit()` method needs to be called beforehand.
+
+            Parameters:
+                N : int
+                    Number of iterations of permutation tests.
+            
+            Returns:
+                p_values : dict
+                    Dictioanary consisting of `{"hyperparameter" : p value}` pairs. p value is percents.
+        """
         if not self.is_fitted:
             raise Exception("You need to call self.fit_and_viz beforehand")
         
@@ -135,6 +205,13 @@ class Dashboard(GridSearchCV):
 
 
     def __create_mainwebsite(self) -> None:
+        """
+        Creates main HTML dashboard. Saves it as "index.html".
+        Site consists of basic information panel, and table displaying Gridsearch results.
+
+        Warning: `fit()` method needs to be called beforehand.
+        """
+
         if not self.is_fitted:
             raise Exception("You need to call self.fit_and_viz beforehand")
 
@@ -270,6 +347,18 @@ class Dashboard(GridSearchCV):
             f.write(html_text)
 
     def __create_viz_website(self, p_values:dict, alpha:float) -> None:
+        """
+        Creates main HTML dashboard. Saves it as "viz_site.html".
+        Site consists of panels containing plots and other informations. 
+
+        Warning: `fit()` method needs to be called beforehand.
+
+        Parameters:
+            p_values : dict
+                 Dictionary containing pairs: `{"hyperparameter name" : p value}`
+            alpha : float
+                 threshold for statistical significance.
+        """
 
         if not self.is_fitted:
             raise Exception("You need to call self.fit_and_viz beforehand")
