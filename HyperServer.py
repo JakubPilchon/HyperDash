@@ -4,6 +4,16 @@ from functools import partial
 
 class HyperDashServer(HTTPServer):
     def __init__(self, directory:str, host:str ="localhost", port:int = 8050, **kwargs) -> None:
+        #check for missing files
+        missed = []
+
+        for file in ["viz_site.html", "index.html"]:
+            if  not os.path.isfile(os.path.join(directory, file)):
+                missed.append(file)
+        
+        if missed:
+            raise FileNotFoundError(f"files missing: {missed}")
+
         print("HyperDash 2024")
         handler = partial(SimpleHTTPRequestHandler, directory = directory)
         self.host = host
