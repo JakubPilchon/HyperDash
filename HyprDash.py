@@ -8,7 +8,7 @@ import os
 import time
 
 class Dashboard(GridSearchCV):
-    """
+    r"""
     Class creating Hyperdash directory containing HTML files and plots. 
 
     This class inherits form `sklearn.model_selection_GridSearchCV`.
@@ -35,7 +35,7 @@ class Dashboard(GridSearchCV):
         time : float
              Time duration of gridsearch
         DATA_FILE_NAME : str
-             file name on which are stored gridsearhc results
+             file name on which are stored gridsearch results
 
     Public Methods:
         fit() :
