@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+        <html lang = "en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>HyprDash</title>
+            <style>
+                body {
+                    overflow: scroll;
+                    font-family: Arial, Helvetica, sans-serif;
+                    background: #35383d;
+                    color: white;
+                }
+                div.header {
+                    display: inline-flex;
+                    width: 99%;
+                    background: rgb(101,69,151);
+                    background: linear-gradient(84deg, rgba(101,69,151,1) 0%, rgba(87,74,226,1) 100%);
+                    text-align: center;
+                    padding: 10px;
+                }
+                ul {
+                    
+                    list-style-type: none;
+                    padding: 10px;
+                }
+                li:hover {
+                    background: #AB81CD;
+                }
+                li {
+                    float: right;
+                    display: inline;
+                    padding-inline: 20px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                }
+                a {
+                    color: white;
+                    text-decoration: none;
+                }
+                div.main_container {
+                    padding: 20px;
+                    display: grid;
+                    gap: 10px;
+                }
+                div.feature_container {
+                    padding-bottom: 5px;
+                    margin-left: auto;
+                    margin-right: auto;
+                    min-width: 1100px;
+                    background-color: rgb(43,46,51);
+                    border: 3px solid rgb(56, 60, 67);
+                    border-radius: 5px;
+
+                    gap: 10px;
+                }
+                table.dataframe {
+                    margin: 10px;
+                }
+                #title_and_viz {
+                    min-width: 680px;
+                    float: left;
+                }
+                #stats {
+                    float: right;
+                    min-width: 420px;
+                }
+                #title {
+                    border: 3px solid rgb(66, 70, 77);
+                    border-radius: 5px;
+                    background: #AB81CD;
+                    padding: 2px;
+                    max-width: 50%;
+                    height: 10%;
+                    border-radius: 10px;
+                    margin: 10px;
+                }
+                #pvalue {
+                  max-width: 350px;
+                  border-radius: 5px;
+                  border: 3px solid rgb(56, 60, 67);
+                  margin: 5px;
+                  overflow: auto;
+                  padding: 5px;
+                }
+                img {
+                    display: block;
+                    text-align: center;
+                    margin-left: 1%;
+                    margin-right: auto;
+                }
+                th {
+                    background-color:rgb(101,69,151);
+                    padding: 5px;
+                }
+                tr:nth-child(even) {
+                background-color: rgb(43,46,51);
+                }
+                tr:nth-child(odd) {
+                background-color: rgb(56, 60, 67);
+                }
+                tr:hover {
+                    background-color: rgb(33,36,41);
+                }       
+            </style>
+        </head>
+
+        <body>
+        <div class="header">
+        <h1>HyprDash</h1>
+        <ul>
+            <li><a href="index.html">Results</a></li>
+            <li><a href="viz_site.html">Hyperparameter Analytics</a></li>
+            </ul>
+        </div>
+        <div class="main_container">
+
+                <!-- Main data analysis container-->
+            <div class="feature_container">
+            <div id="title_and_viz" class = "separator">
+                <div id="title"><h2>criterion</h2></div>
+                <div id="image_containter"><img src='viz\param_criterion_plot.png' alt="text"></div>
+            </div>
+
+            <div id="stats" class = "separator"> 
+                <table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Criterion</th>
+      <th>Mean test score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>entropy</td>
+      <td>0.948778</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>gini</td>
+      <td>0.956667</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>log_loss</td>
+      <td>0.948944</td>
+    </tr>
+  </tbody>
+</table> <br> <div id="pvalue"> The observed standard deviation in grouped hyperparameter mean scores is due to diffrences in given hyperparameter and not random chance <br> P value: 0.0</div></div></div><div class="feature_container">
+            <div id="title_and_viz" class = "separator">
+                <div id="title"><h2>max_depth</h2></div>
+                <div id="image_containter"><img src='viz\param_max_depth_plot.png' alt="text"></div>
+            </div>
+
+            <div id="stats" class = "separator"> 
+                <table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Max depth</th>
+      <th>Mean test score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3</td>
+      <td>0.952889</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4</td>
+      <td>0.951667</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>5</td>
+      <td>0.950778</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>6</td>
+      <td>0.951000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>7</td>
+      <td>0.951333</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>8</td>
+      <td>0.951111</td>
+    </tr>
+  </tbody>
+</table> <br> <div id="pvalue"> The observed standard deviation in grouped hyperparameter mean scores is due to random chance and NOT due to diffrences in given hyperparameter <br> P value: 53.15</div></div></div><div class="feature_container">
+            <div id="title_and_viz" class = "separator">
+                <div id="title"><h2>min_samples_split</h2></div>
+                <div id="image_containter"><img src='viz\param_min_samples_split_plot.png' alt="text"></div>
+            </div>
+
+            <div id="stats" class = "separator"> 
+                <table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Min samples split</th>
+      <th>Mean test score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>0.950926</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>0.951111</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>0.950463</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5</td>
+      <td>0.952593</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>6</td>
+      <td>0.952222</td>
+    </tr>
+  </tbody>
+</table> <br> <div id="pvalue"> The observed standard deviation in grouped hyperparameter mean scores is due to random chance and NOT due to diffrences in given hyperparameter <br> P value: 21.25</div></div></div><div class="feature_container">
+            <div id="title_and_viz" class = "separator">
+                <div id="title"><h2>min_samples_leaf</h2></div>
+                <div id="image_containter"><img src='viz\param_min_samples_leaf_plot.png' alt="text"></div>
+            </div>
+
+            <div id="stats" class = "separator"> 
+                <table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Min samples leaf</th>
+      <th>Mean test score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0.959556</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>0.948370</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>0.948741</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>0.949185</td>
+    </tr>
+  </tbody>
+</table> <br> <div id="pvalue"> The observed standard deviation in grouped hyperparameter mean scores is due to diffrences in given hyperparameter and not random chance <br> P value: 0.0</div></div></div>
+            
+            
+
+        </div></body></html>
