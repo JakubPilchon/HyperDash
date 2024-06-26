@@ -164,8 +164,8 @@ class Dashboard(GridSearchCV):
                 p_values : dict
                     Dictioanary consisting of `{"hyperparameter" : p value}` pairs. p value is percents.
         """
-        if not self.is_fitted:
-            raise Exception("You need to call self.fit_and_viz beforehand")
+        
+        assert self.is_fitted, "You need to call self.fit_and_viz beforehand"
         
         # Permutation Test
         # h_0 -> The observed standard deviation in grouped hyperparameter mean scores is due to random chance and NOT due to diffrences in given hyperparameter
@@ -211,9 +211,8 @@ class Dashboard(GridSearchCV):
 
         Warning: `fit()` method needs to be called beforehand.
         """
-
-        if not self.is_fitted:
-            raise Exception("You need to call self.fit_and_viz beforehand")
+        
+        assert self.is_fitted, "You need to call self.fit_and_viz beforehand"
 
         # site with tables layout:
         html_text = '''
@@ -360,8 +359,7 @@ class Dashboard(GridSearchCV):
                  threshold for statistical significance.
         """
 
-        if not self.is_fitted:
-            raise Exception("You need to call self.fit_and_viz beforehand")
+        assert self.is_fitted, "You need to call self.fit_and_viz beforehand"
         
         vis_site = '''<!DOCTYPE html>
         <html lang = "en">
