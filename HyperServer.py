@@ -12,7 +12,7 @@ class HyperDashServer(HTTPServer):
                  directory where Dashboard sites are located.
             host : str, optional
                  server address. Default is "localhost"
-            port : int
+            port : int, optional
                  port on which server is run. Default is `8050`
     """
     

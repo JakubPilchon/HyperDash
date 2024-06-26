@@ -1,7 +1,7 @@
 # HyperDash
 This is HyperDash, you go-to hyperparameter tuning dashboard! :fire: :fire:
 
-Creates Dashboard visualizing hyperparameter seach. Implements permutaion tests for models hyperparameer sensitivity.
+Creates Dashboard visualizing hyperparameter search. Implements permutaion tests for models hyperparameter sensitivity.
 
 ### Usage 
 Import library
