@@ -126,6 +126,23 @@ class Dashboard(GridSearchCV):
         # saving gridsearch results into csv file
         self.data.to_csv(self.path + '/' + self.dirname + '/' + self.DATA_FILE_NAME)
 
+        # Generate Score/Time relation plots
+        with plt.style.context('dark_background'):
+            fig, ax = plt.subplots()
+
+            plt.scatter(x=self.data["mean_test_score"],
+                             y=self.data["mean_fit_time"],
+                             alpha=0.5, edgecolors=None,
+                             color='#AB81CD')
+
+        fig.set_size_inches(10,7.5)          
+        ax.set_facecolor("#383C43")
+        fig.patch.set_facecolor("#2B2E33")
+        plt.xlabel("Test Score")
+        plt.ylabel("Training Time")
+        plt.title(f"Test/Time relation; correlation={self.data["mean_test_score"].corr(self.data['mean_fit_time']):5f}")
+        plt.savefig(os.path.join(self.path, self.dirname, "viz", "time_score_plot.png"))
+
 
         # Generate bar plots of mean score by parameters
         for param in self.PARAMS_KEY:
@@ -262,7 +279,7 @@ class Dashboard(GridSearchCV):
                     text-align: center;
                     border-style:none;
                 }
-                                div.info {
+                div.info {
                     padding-top: 5px;
                     padding-bottom: 5px;
                     margin-left: auto;
@@ -274,12 +291,14 @@ class Dashboard(GridSearchCV):
                     border: 3px solid rgb(56, 60, 67);
                     border-radius: 5px;
                     gap: 10px;
-                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
                 }
                 div.separator {
-                    width: 50%;
+                    width: 45%;
                     font-size: large;
                     padding-left: 10px;
+                    display: inline-block; 
                 }
                 #overview {
                     border: 3px solid rgb(66, 70, 77);
@@ -291,6 +310,9 @@ class Dashboard(GridSearchCV):
                     border-radius: 10px;
                     margin-top: 10px;
                     font-size: larger;
+                }
+                #plot {
+                  align-items: center;
                 }
                 th {
                     background-color:rgb(101,69,151);
@@ -328,8 +350,10 @@ class Dashboard(GridSearchCV):
                 <div class = "info"><div class="separator">
                     <div id="overview"><b>Overview</b></div><br> Number of iterations: {} <br><br> Best model score: {} <br> Mean  model score: {} <br> Model score standard deviation: {}
                 </div>
-                <div class="separator">
-                        <br><br><br>Tuning time: {}s <br> <br> Best time: {}s <br> Mean model time: {}s <br> Model time standard deviation: {}s </div></div>"""
+                    <div class="separator">
+                        <br><br><br>Tuning time: {}s <br> <br> Best time: {}s <br> Mean model time: {}s <br> Model time standard deviation: {}s </div>
+                    <div id="plot"><img src="viz/time_score_plot.png"></div>
+                </div>"""
         
         overview = overview.format(len(self.data), str(self.best_score_), self.data["mean_test_score"].mean(), self.data["mean_test_score"].std(),
                                     self.time, self.data["mean_fit_time"].min(), self.data["mean_fit_time"].mean(), self.data["mean_fit_time"].std())
@@ -524,9 +548,13 @@ class Dashboard(GridSearchCV):
             f.write(vis_site)
 
 if __name__ == "__main__":
-    params = {"criterion" : ['gini', 'entropy'], "max_depth" : list(range(4,7)), "min_samples_split": list(range(2,4)), "min_samples_leaf": list(range(1,5))}
+    #params = {"criterion" : ['gini', 'entropy'], "max_depth" : list(range(4,7)), "min_samples_split": list(range(2,4)), "min_samples_leaf": list(range(1,5))}
     #clf = GridSearchCV(DecisionTreeClassifier(), params)
+    params = {"criterion" : ['gini', 'entropy', 'log_loss'],
+           "max_depth" : list(range(3,9)),
+          "min_samples_split": list(range(2,7)),
+           "min_samples_leaf": list(range(1,5))}
     iris = load_iris()
     clf = Dashboard(DecisionTreeClassifier(), params, "lollllol")
 
-    clf.fit_and_viz(iris.data, iris.target)
+    clf.fit(iris.data, iris.target)
