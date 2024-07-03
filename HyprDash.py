@@ -380,7 +380,7 @@ class Dashboard(GridSearchCV):
 
         html_text = html_text.replace("[info]", overview)
         # insert table with gridsearch results into layout
-        html_text = html_text.replace("[table]", self.data.sort_values("rank_test_score").reset_index().to_html(columns=['rank_test_score', 'mean_test_score', 'std_test_score',  'mean_fit_time', 'std_score_time'] + self.PARAMS_KEY, border=0))
+        html_text = html_text.replace("[table]", self.data.sort_values(by=["mean_test_score", "mean_fit_time"], ascending=[False, True]).reset_index().to_html(columns=['rank_test_score', 'mean_test_score', 'std_test_score',  'mean_fit_time', 'std_score_time'] + self.PARAMS_KEY, border=0))
         
         #create website file
         file_name = "index.html"
@@ -549,7 +549,7 @@ class Dashboard(GridSearchCV):
             source = os.path.join("viz", param+'_plot.png')
 
             # generate score performance table using pandas
-            scores_table = self.data[["mean_test_score", "mean_fit_time", param]].groupby(param).mean().reset_index().rename(columns={'mean_test_score': 'Mean test score',"mean_fit_time":"Mean training time", param: param[6:].capitalize().replace("_", " ")}).to_html(border=0)
+            scores_table = self.data[["mean_test_score", "mean_fit_time", param]].groupby(param).mean().sort_values("mean_test_score", ascending=False).reset_index().rename(columns={'mean_test_score': 'Mean test score',"mean_fit_time":"Mean training time", param: param[6:].capitalize().replace("_", " ")}).to_html(border=0)
 
             # test if p value is bigger or equal to alpha
             if p_values[param] >= alpha * 100:
