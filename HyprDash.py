@@ -128,6 +128,24 @@ class Dashboard(GridSearchCV):
         # saving gridsearch results into csv file
         self.data.to_csv(self.path + '/' + self.dirname + '/' + self.DATA_FILE_NAME)
 
+        # Calculate hyperparameter importance using Random Forest Regressor
+        self.__forest = RandomForestRegressor()
+
+        forest_train = pd.DataFrame([])
+
+        for hyppar in self.PARAMS_KEY:
+            try:
+                forest_train[hyppar] = LabelEncoder().fit_transform(self.data[hyppar])
+            except TypeError:
+                uni = self.data[hyppar].unique()
+                dit = {x:num for x, num in zip(uni, range(len(uni)))}
+                forest_train[hyppar] = self.data[hyppar].map(lambda x: dit[x])
+
+
+        self.__forest.fit(forest_train, self.data["mean_test_score"])
+        print("Feature model score: ", self.__forest.score(forest_train, self.data["mean_test_score"]))
+        print({x:y for x, y in zip(self.__forest.feature_names_in_, self.__forest.feature_importances_)}) ## to delete
+
         # Generate Score/Time relation plots
         with plt.style.context('dark_background'):
             fig, ax = plt.subplots()
@@ -513,11 +531,13 @@ class Dashboard(GridSearchCV):
         container = '''<div class="feature_container">
             <div id="title_and_viz" class = "separator">
                 <div id="title"><h2>{}</h2></div>
-                <div id="image_containter"><img src='{}' alt="text"></div>
+                <div id="image_containter"><img src='{}' title="Kernel Density Estimation plot showing score distributions across diffrent hyperparameter variations"></div>
             </div>
 
             <div id="stats" class = "separator"> 
-                {} <br> <div id="pvalue"> {} <br> P value: {}</div></div></div>'''
+                {} <br> <div id="pvalue"> {} <br> P value: {:.2f}% </div> <br>
+                        <div id="pvalue" title="Feature importance metric calculated using Random Forest"> Feature Importance: {:.2f}% </div>
+                </div></div>'''
 
         table = ''
 
@@ -539,8 +559,9 @@ class Dashboard(GridSearchCV):
                 # otherwise it is safe to assume that alternative hypothesis is true
                 true_h = "The observed standard deviation in grouped hyperparameter mean scores is due to diffrences in given hyperparameter and not random chance"
 
+            importance = self.__forest.feature_importances_[ np.where(self.__forest.feature_names_in_ == param) ][0] *100
             # add feature container html code into main threshold
-            table += container.format(title, source, scores_table, true_h ,p_values[param])
+            table += container.format(title, source, scores_table, true_h ,p_values[param], importance)
         # add feature containers to main sites
         vis_site = vis_site.replace('[features]', table)
 
