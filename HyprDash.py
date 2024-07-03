@@ -1,5 +1,7 @@
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import GridSearchCV
 import pandas as pd
 import numpy as np
@@ -146,7 +148,7 @@ class Dashboard(GridSearchCV):
 
         # Generate bar plots of mean score by parameters
         for param in self.PARAMS_KEY:
-            title= "Scores distribution by "+  param[6:].replace("_", " ")
+            title= "Scores distribution by "+  param[6:].replace("_", " ").capitalize()
 
             with plt.style.context('dark_background'):
                 fig, ax = plt.subplots()
@@ -360,8 +362,7 @@ class Dashboard(GridSearchCV):
 
         html_text = html_text.replace("[info]", overview)
         # insert table with gridsearch results into layout
-        html_text = html_text.replace("[table]", self.data.sort_values("rank_test_score").reset_index().to_html(columns=['mean_fit_time', 'split0_test_score', 'split1_test_score',
-       'split2_test_score', 'split3_test_score', 'split4_test_score', 'mean_test_score', 'std_test_score', 'rank_test_score'] + self.PARAMS_KEY, border=0))
+        html_text = html_text.replace("[table]", self.data.sort_values("rank_test_score").reset_index().to_html(columns=['rank_test_score', 'mean_test_score', 'std_test_score',  'mean_fit_time', 'std_score_time'] + self.PARAMS_KEY, border=0))
         
         #create website file
         file_name = "index.html"
@@ -528,7 +529,7 @@ class Dashboard(GridSearchCV):
             source = os.path.join("viz", param+'_plot.png')
 
             # generate score performance table using pandas
-            scores_table = self.data[["mean_test_score", param]].groupby(param).mean().reset_index().rename(columns={'mean_test_score': 'Mean test score', param: param[6:].capitalize().replace("_", " ")}).to_html(border=0)
+            scores_table = self.data[["mean_test_score", "mean_fit_time", param]].groupby(param).mean().reset_index().rename(columns={'mean_test_score': 'Mean test score',"mean_fit_time":"Mean training time", param: param[6:].capitalize().replace("_", " ")}).to_html(border=0)
 
             # test if p value is bigger or equal to alpha
             if p_values[param] >= alpha * 100:
