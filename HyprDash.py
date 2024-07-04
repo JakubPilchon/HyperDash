@@ -148,18 +148,25 @@ class Dashboard(GridSearchCV):
 
         # Generate Score/Time relation plots
         with plt.style.context('dark_background'):
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(2)
 
-            plt.scatter(x=self.data["mean_test_score"],
+            ax[0].scatter(x=self.data["mean_test_score"],
                              y=self.data["mean_fit_time"],
                              alpha=0.5, edgecolors=None,
                              color='#AB81CD')
+            ax[1].bar(self.__forest.feature_names_in_, self.__forest.feature_importances_, color='#AB81CD', edgecolor="#654597", linewidth=0.5)
 
-        fig.set_size_inches(10,7.5)          
-        ax.set_facecolor("#383C43")
+        fig.set_size_inches(10,15)          
+        ax[0].set_facecolor("#383C43")
+        ax[0].set_xlabel("Test Score")
+        ax[0].set_ylabel("Training Time")
+        ax[0].set_title(f"Test/Time relation; correlation={self.data["mean_test_score"].corr(self.data['mean_fit_time']):5f}")
+                   
+        ax[1].set_facecolor("#383C43")
+        ax[1].set_xlabel("Hyperparameter Importance")
+        ax[1].set_ylabel("Hyperparameter Name")
+        ax[1].set_title(f"Information gain from each Hyperparameter")
         fig.patch.set_facecolor("#2B2E33")
-        plt.xlabel("Test Score")
-        plt.ylabel("Training Time")
         plt.title(f"Test/Time relation; correlation={self.data["mean_test_score"].corr(self.data['mean_fit_time']):5f}")
         plt.savefig(os.path.join(self.path, self.dirname, "viz", "time_score_plot.png"))
 
