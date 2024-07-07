@@ -156,18 +156,19 @@ class Dashboard(GridSearchCV):
                              color='#AB81CD')
             ax[1].bar(self.__forest.feature_names_in_, self.__forest.feature_importances_, color='#AB81CD', edgecolor="#654597", linewidth=0.5)
 
-        fig.set_size_inches(10,15)          
+        fig.set_size_inches(w=10, h=15)          
         ax[0].set_facecolor("#383C43")
         ax[0].set_xlabel("Test Score")
         ax[0].set_ylabel("Training Time")
         ax[0].set_title(f"Test/Time relation; correlation={self.data["mean_test_score"].corr(self.data['mean_fit_time']):5f}")
                    
         ax[1].set_facecolor("#383C43")
-        ax[1].set_xlabel("Hyperparameter Importance")
-        ax[1].set_ylabel("Hyperparameter Name")
-        ax[1].set_title(f"Information gain from each Hyperparameter")
+        ax[1].set_ylabel("Hyperparameter Importance")
+        ax[1].set_xlabel("Hyperparameter Name")
+        ax[1].tick_params("x", labelrotation=45.)
+        ax[1].title.set_text(f"Information gain from each Hyperparameter")
         fig.patch.set_facecolor("#2B2E33")
-        plt.title(f"Test/Time relation; correlation={self.data["mean_test_score"].corr(self.data['mean_fit_time']):5f}")
+        #plt.title(f"")
         plt.savefig(os.path.join(self.path, self.dirname, "viz", "time_score_plot.png"))
 
 
