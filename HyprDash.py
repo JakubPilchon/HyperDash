@@ -168,7 +168,6 @@ class Dashboard(GridSearchCV):
         ax[1].tick_params("x", labelrotation=45.)
         ax[1].title.set_text(f"Information gain from each Hyperparameter")
         fig.patch.set_facecolor("#2B2E33")
-        #plt.title(f"")
         plt.savefig(os.path.join(self.path, self.dirname, "viz", "time_score_plot.png"))
 
 
